@@ -1,0 +1,51 @@
+/* A software development team aimed to design a versatile utility that could perform basic arithmetic
+
+operations while demonstrating the concept of function overloading. This effort resulted in a class-
+based calculator system capable of handling various combinations of input types, such as integers and
+
+floating-point numbers. The system includes multiple overloaded add functions, each tailored to
+accept distinct input types and perform addition operations accordingly. This approach ensures the
+calculator is adaptable and provides consistent functionality regardless of the input types.
+The case revolves around testing and validating the versatility of this calculator. Participants are
+expected to create instances of the calculator, invoke the appropriate overloaded functions for various
+input scenarios, and store the resulting values for further analysis. To organize and display these
+results, the system incorporates methods to sequentially process and present the outcomes. */
+
+#include <iostream>
+using namespace std;
+
+class Calculator {
+private:
+    float result1, result2;
+
+public:
+
+    float add(int a, int b)
+    {
+        result1 = a + b;
+        return result1;
+    }
+
+    float add(float a, float b)
+    {
+        result2 = a + b;
+        return result2;
+    }
+
+    void Results() {
+        cout << "\nResults of all additions:";
+        cout << "int + int  = " << result1 << endl;
+        cout << "float + float  = " << result2 << endl;
+    }
+};
+
+int main() {
+    Calculator cal;
+    
+    cal.add(10, 20);       // int + int
+    cal.add(3.5f, 4.5f);   // float + float
+
+    cal.Results();
+
+    return 0;
+}
