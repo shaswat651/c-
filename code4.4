@@ -1,0 +1,111 @@
+/* In a bid to design an efficient and user-friendly banking system, a structure was proposed that mirrors
+the real-world operations of various account types. The foundation of the system is a base class
+representing a generic bank account, encapsulating essential details such as account number and
+balance. Building on this foundation, two specialized account types were created: a savings account,
+which includes an interest rate as an additional feature, and a current account, which allows an
+overdraft limit to accommodate specific customer needs.
+To ensure proper initialization and cleanup of account objects, constructors and destructors were
+implemented. Essential banking operations such as deposits and withdrawals were made available for
+both account types, allowing users to perform and manage their transactions effectively. The system
+also accounted for the need to track and manage transaction history, enabling operations such as
+undoing the last transaction. This was achieved by simulating a mechanism to store a sequence of
+transactions for each account type, providing insight into different ways of managing and organizing
+data. */
+
+#include <iostream>
+using namespace std;
+
+class BankAccount {
+protected:
+    int accountNumber;
+    float balance;
+    float lastTransaction;
+
+public:
+    BankAccount(int accNo, float bal) {
+        accountNumber = accNo;
+        balance = bal;
+        lastTransaction = 0;
+    }
+
+    void deposit(float amount) {
+        balance += amount;
+        lastTransaction = amount;
+        cout << "Deposited: " << amount << endl;
+    }
+
+    virtual void withdraw(float amount) {
+        if (amount <= balance) {
+            balance -= amount;
+            lastTransaction = -amount;
+            cout << "Withdrawn: " << amount << endl;
+        } else {
+            cout << "Not enough balance!" << endl;
+        }
+    }
+
+    void undoLastTransaction() {
+        balance -= lastTransaction;
+        cout << "Undo Last Transaction: " << lastTransaction << endl;
+        lastTransaction = 0;
+    }
+
+    void showDetails() {
+        cout << "Account Number: " << accountNumber << ", Balance: " << balance << endl;
+    }
+};
+
+class SavingsAccount : public BankAccount {
+    float interestRate;
+public:
+    SavingsAccount(int accNo, float bal, float rate) : BankAccount(accNo, bal) {
+        interestRate = rate;
+    }
+
+    void showDetails() {
+        BankAccount::showDetails();
+        cout << "Interest Rate: " << interestRate << "%" << endl;
+    }
+};
+
+class CurrentAccount : public BankAccount {
+    float overdraftLimit;
+public:
+    CurrentAccount(int accNo, float bal, float limit) : BankAccount(accNo, bal) {
+        overdraftLimit = limit;
+    }
+
+    void withdraw(float amount) {
+        if (amount <= balance + overdraftLimit) {
+            balance -= amount;
+            lastTransaction = -amount;
+            cout << "Withdrawn: " << amount << endl;
+        } else {
+            cout << "Exceeds overdraft limit!" << endl;
+        }
+    }
+
+    void showDetails() {
+        BankAccount::showDetails();
+        cout << "Overdraft Limit: " << overdraftLimit << endl;
+    }
+};
+
+int main() {
+    SavingsAccount sAcc(101, 5000, 4.5);
+    cout << "\n--- Savings Account ---" << endl;
+    sAcc.showDetails();
+    sAcc.deposit(1000);
+    sAcc.withdraw(2000);
+    sAcc.undoLastTransaction();
+    sAcc.showDetails();
+
+    CurrentAccount cAcc(202, 3000, 1000);
+    cout << "\n--- Current Account ---" << endl;
+    cAcc.showDetails();
+    cAcc.withdraw(3500);
+    cAcc.undoLastTransaction();
+    cAcc.showDetails();
+
+    return 0;
+}
