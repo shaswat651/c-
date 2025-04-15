@@ -1,0 +1,56 @@
+/* A team of developers is tasked with building a temperature conversion system for a weather
+application. To achieve this, the team creates two classes: Celsius and Fahrenheit. These classes
+handle the conversion between temperature units, with the ability to convert from Celsius to
+Fahrenheit and vice versa using type conversion. The team utilizes operator overloading to define the
+conversion operators for both classes, enabling seamless conversions between the two units.
+The system also requires the ability to compare two temperature objects to check if they are equal.
+This is achieved by overloading the equality operator ==, which compares the values of the
+temperatures in their respective units.
+To ensure smooth processing of temperature conversions, the team needs to manage and store
+multiple converted temperature objects. Two approaches are considered for handling this task. The
+
+first approach involves using a dynamic data structure, a queue, to process the conversions in a first-
+in-first-out (FIFO) manner. Alternatively, a basic array is used to store the converted objects in a static
+manner. */
+
+#include <iostream>
+using namespace std;
+
+class Fahrenheit; 
+
+class Celsius {
+private:
+    double temp;
+public:
+    Celsius(double t = 0) : temp(t) {}
+    operator Fahrenheit(); 
+    bool operator==(const Celsius& other) { return temp == other.temp; }
+    void display() const { cout << temp << " °C" << endl; }
+};
+
+class Fahrenheit {
+private:
+    double temp;
+public:
+    Fahrenheit(double t = 0) : temp(t) {}
+    operator Celsius(); 
+    bool operator==(const Fahrenheit& other) { return temp == other.temp; }
+    void display() const { cout << temp << " °F" << endl; }
+};
+
+Celsius::operator Fahrenheit() { return Fahrenheit((temp * 9 / 5) + 32); }
+
+Fahrenheit::operator Celsius() { return Celsius((temp - 32) * 5 / 9); }
+
+int main() {
+    
+    Celsius c1(25);
+    Fahrenheit f1 = c1;  
+    c1.display(); 
+    f1.display(); 
+
+    if (c1 == Celsius(25)) cout << "c1 is 25°C." << endl;
+    if (f1 == Fahrenheit(77)) cout << "f1 is 77°F." << endl;
+
+    return 0;
+}
