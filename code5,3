@@ -1,0 +1,83 @@
+/* A team of software developers was tasked with creating a graphical simulation where operations on
+2D points play a crucial role. To facilitate this, they designed a class Point that encapsulates the
+coordinates x and y. The class provides flexibility through overloaded operators to manipulate points
+efficiently. The unary operator - is overloaded to negate the coordinates of a point, while the binary
+operator + enables the addition of two points. Additionally, the equality operator == is overloaded to
+compare whether two points have identical coordinates.
+The development process required performing various operations between multiple points. To
+manage these operations effectively, a mechanism was needed to track and potentially undo them.
+This challenge prompted two approaches: using a ready-made dynamic stack structure or building a
+custom stack implementation. By managing a sequence of operations in reverse, the stack-based
+design allowed for a systematic undo capability, crucial for simulations involving iterative adjustments. */
+
+#include <iostream>
+
+using namespace std;
+
+class Point {
+private:
+    int x, y;
+
+public:
+
+    Point(int x = 0, int y = 0) : x(x), y(y) {}
+
+    Point operator-() {
+        return Point(-x, -y);
+    }
+
+    Point operator+(const Point& p) {
+        return Point(x + p.x, y + p.y);
+    }
+
+    bool operator==(const Point& p) {
+        return (x == p.x && y == p.y);
+    }
+
+    void display() const {
+        cout << "(" << x << ", " << y << ")" << endl;
+    }
+    int getX() { return x; }
+    int getY() { return y; }
+};
+
+class PointHistory {
+private:
+    Point history[10];
+    int currentSize;
+
+public:
+    PointHistory() : currentSize(0) {}
+
+    void addState(const Point& p) {
+        if (currentSize < 10) {
+            history[currentSize] = p;
+            currentSize++;
+        } else {
+            cout << "History is full!" << endl;
+        }
+    }
+
+    void undo() {
+        if (currentSize > 0) {
+            currentSize--;
+        } else {
+            cout << "No operations to undo!" << endl;
+        }
+    }
+    void displayLastState() const {
+        if (currentSize > 0) {
+            history[currentSize - 1].display();
+        } else {
+            cout << "No history to display!" << endl;
+        }
+    }
+};
+
+int main() {
+    Point p1(3, 4);
+    Point p2(1, 2);
+    PointHistory history;
+    cout << "Initial Point 1: ";
+    p1.display();
+}
