@@ -1,17 +1,4 @@
-/* A team of software developers was tasked with creating a graphical simulation where operations on
-2D points play a crucial role. To facilitate this, they designed a class Point that encapsulates the
-coordinates x and y. The class provides flexibility through overloaded operators to manipulate points
-efficiently. The unary operator - is overloaded to negate the coordinates of a point, while the binary
-operator + enables the addition of two points. Additionally, the equality operator == is overloaded to
-compare whether two points have identical coordinates.
-The development process required performing various operations between multiple points. To
-manage these operations effectively, a mechanism was needed to track and potentially undo them.
-This challenge prompted two approaches: using a ready-made dynamic stack structure or building a
-custom stack implementation. By managing a sequence of operations in reverse, the stack-based
-design allowed for a systematic undo capability, crucial for simulations involving iterative adjustments. */
-
 #include <iostream>
-
 using namespace std;
 
 class Point {
@@ -19,65 +6,158 @@ private:
     int x, y;
 
 public:
+    Point() : x(0), y(0) {}
+    Point(int xVal, int yVal) : x(xVal), y(yVal) {}
 
-    Point(int x = 0, int y = 0) : x(x), y(y) {}
+    // Overload + operator
+    Point operator+(const Point& other) const {
+        return Point(x + other.x, y + other.y);
+    }
 
-    Point operator-() {
+    // Overload unary - operator
+    Point operator-() const {
         return Point(-x, -y);
     }
 
-    Point operator+(const Point& p) {
-        return Point(x + p.x, y + p.y);
+    // Overload == operator
+    bool operator==(const Point& other) const {
+        return x == other.x && y == other.y;
     }
 
-    bool operator==(const Point& p) {
-        return (x == p.x && y == p.y);
+    // Friend function for input
+    friend istream& operator>>(istream& in, Point& p) {
+        cout << "Enter x: ";
+        in >> p.x;
+        cout << "Enter y: ";
+        in >> p.y;
+        return in;
+    }
+
+    // Friend function for output
+    friend ostream& operator<<(ostream& out, const Point& p) {
+        out << "(" << p.x << ", " << p.y << ")";
+        return out;
+    }
+};
+
+class PointStack {
+private:
+    static const int MAX = 100;
+    Point stack[MAX];
+    int top;
+
+public:
+    PointStack() : top(-1) {}
+
+    bool isEmpty() const {
+        return top == -1;
+    }
+
+    bool isFull() const {
+        return top == MAX - 1;
+    }
+
+    void push(const Point& p) {
+        if (!isFull()) {
+            stack[++top] = p;
+        } else {
+            cout << "Stack overflow! Cannot push.\n";
+        }
+    }
+
+    Point pop() {
+        if (!isEmpty()) {
+            return stack[top--];
+        } else {
+            cout << "Stack underflow! Cannot pop.\n";
+            return Point();
+        }
     }
 
     void display() const {
-        cout << "(" << x << ", " << y << ")" << endl;
-    }
-    int getX() { return x; }
-    int getY() { return y; }
-};
-
-class PointHistory {
-private:
-    Point history[10];
-    int currentSize;
-
-public:
-    PointHistory() : currentSize(0) {}
-
-    void addState(const Point& p) {
-        if (currentSize < 10) {
-            history[currentSize] = p;
-            currentSize++;
-        } else {
-            cout << "History is full!" << endl;
+        if (isEmpty()) {
+            cout << "Stack is empty.\n";
+            return;
         }
-    }
 
-    void undo() {
-        if (currentSize > 0) {
-            currentSize--;
-        } else {
-            cout << "No operations to undo!" << endl;
-        }
-    }
-    void displayLastState() const {
-        if (currentSize > 0) {
-            history[currentSize - 1].display();
-        } else {
-            cout << "No history to display!" << endl;
+        cout << "Stack contents (top to bottom):\n";
+        for (int i = top; i >= 0; --i) {
+            cout << stack[i] << endl;
         }
     }
 };
 
 int main() {
-    Point p1(3, 4);
-    Point p2(1, 2);
-    PointHistory history;
-    cout << "Initial Point 1: ";
-    p1.display();
+    PointStack history;
+    int choice;
+    Point p1, p2, result;
+
+    do {
+        cout << "--- Point Operation Menu ---\n";
+        cout << "1. Input and push a point\n";
+        cout << "2. Add two points\n";
+        cout << "3. Negate a point\n";
+        cout << "4. Compare two points\n";
+        cout << "5. Undo last operation\n";
+        cout << "6. Display point history (stack)\n";
+        cout << "7. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Input point:\n";
+            cin >> p1;
+            history.push(p1);
+            break;
+
+        case 2:
+            cout << "Input first point:\n";
+            cin >> p1;
+            cout << "Input second point:\n";
+            cin >> p2;
+            result = p1 + p2;
+            cout << "Result: " << result << endl;
+            history.push(result);
+            break;
+
+        case 3:
+            cout << "Input point to negate:\n";
+            cin >> p1;
+            result = -p1;
+            cout << "Negated point: " << result << endl;
+            history.push(result);
+            break;
+
+        case 4:
+            cout << "Input first point:\n";
+            cin >> p1;
+            cout << "Input second point:\n";
+            cin >> p2;
+            if (p1 == p2)
+                cout << "Points are equal.\n";
+            else
+                cout << "Points are not equal.\n";
+            break;
+
+        case 5:
+            cout << "Undoing last operation...\n";
+            history.pop();
+            break;
+
+        case 6:
+            history.display();
+            break;
+
+        case 7:
+            cout << "Exiting...\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Try again.\n";
+        }
+
+    } while (choice != 7);
+
+    cout << endl << "24CE094" << endl;
 }
