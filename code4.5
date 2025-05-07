@@ -1,57 +1,171 @@
-/* In an educational setting, an advanced grading system was conceptualized to accommodate the
-diverse evaluation criteria for students at different academic levels. At the heart of the system is an
-abstract base class that defines the grading framework. This class includes a protected member to
-store marks and declares a pure virtual function for computing grades, ensuring that specific grading
-logic is implemented by derived classes.
-Two distinct derived classes were introduced to handle the unique grading needs of undergraduate
-and postgraduate students. Each class defines its own implementation of the grade computation
-method, reflecting the varying academic expectations for these groups. The system enables users to
-input student data, compute grades based on the respective criteria, and manage a collection of
-student records. */
-
-#include <iostream>
+#include<iostream>
+#include<string>
 using namespace std;
 
-class Student {
+class GradingSystem
+{
 protected:
+    string studentname;
     float marks;
 public:
-    Student(float m) : marks(m) {}
+    GradingSystem(string name, float m) : studentname(name), marks(m) {}
+
     virtual void computeGrade() = 0;
-};
 
-class Undergraduate : public Student {
-public:
-    Undergraduate(float m) : Student(m) {}
-    void computeGrade() override {
-        if (marks >= 60) cout << "Grade: A" << endl;
-        else if (marks >= 50) cout << "Grade: B" << endl;
-        else cout << "Grade: C" << endl;
+    void displayStudentInfo()
+    {
+        cout << "Student Name: " << studentname << endl;
+        cout << "Marks: " << marks << endl;
     }
 };
 
-class Postgraduate : public Student {
+class UnderGraduate : public GradingSystem
+{
 public:
-    Postgraduate(float m) : Student(m) {}
-    void computeGrade() override {
-        if (marks >= 80) cout << "Grade: A" << endl;
-        else if (marks >= 70) cout << "Grade: B" << endl;
-        else cout << "Grade: C" << endl;
+    UnderGraduate(string name, float m) : GradingSystem(name, m) {}
+
+    void computeGrade() override
+    {
+        string grade;
+        if (marks >= 90)
+        {
+            grade = "A+";
+        }
+        else if (marks >= 80)
+        {
+            grade = "A";
+        }
+        else if (marks >= 70)
+        {
+            grade = "B+";
+        }
+        else if (marks >= 60)
+        {
+            grade = "B";
+        }
+        else if (marks >= 50)
+        {
+            grade = "C";
+        }
+        else
+        {
+            grade = "F";
+        }
+        cout << "GRADE: " << grade << endl;
     }
 };
 
-int main() {
-    float marks;
+class PostGraduate : public GradingSystem
+{
+public:
+    PostGraduate(string name, float m) : GradingSystem(name, m) {}
+
+    void computeGrade() override
+    {
+        string grade;
+        if (marks >= 85)
+        {
+            grade = "A+";
+        }
+        else if (marks >= 75)
+        {
+            grade = "A";
+        }
+        else if (marks >= 65)
+        {
+            grade = "B+";
+        }
+        else if (marks >= 55)
+        {
+            grade = "B";
+        }
+        else if (marks >= 45)
+        {
+            grade = "C";
+        }
+        else
+        {
+            grade = "F";
+        }
+        cout << "GRADE: " << grade << endl;
+    }
+};
+
+int main()
+{
     int choice;
-    cin >> choice >> marks;
+    string name;
+    float marks;
+    int student_type;
+    GradingSystem* students[100];
+    int student_count = 0;
 
-    if (choice == 1) {
-        Undergraduate u(marks);
-        u.computeGrade();
-    } else if (choice == 2) {
-        Postgraduate p(marks);
-        p.computeGrade();
+    do
+    {
+        cout << "1. Add UnderGraduate Student\n"
+             << "2. Add PostGraduate Student\n"
+             << "3. Display Student Grades\n"
+             << "4. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        GradingSystem* student = nullptr;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter UnderGraduate student name: ";
+            cin >> name;
+            cout << "Enter marks for " << name << ": ";
+            cin >> marks;
+            student = new UnderGraduate(name, marks);
+            students[student_count++] = student;
+            student->displayStudentInfo();
+            student->computeGrade();
+            break;
+
+        case 2:
+            cout << "Enter PostGraduate student name: ";
+            cin >> name;
+            cout << "Enter marks for " << name << ": ";
+            cin >> marks;
+            student = new PostGraduate(name, marks);
+            students[student_count++] = student;
+            student->displayStudentInfo();
+            student->computeGrade();
+            break;
+
+        case 3:
+            if (student_count == 0)
+            {
+                cout << "No student records available." << endl;
+            }
+            else
+            {
+                cout<<endl<<"DISPLAYING STUDENT RECORDS"<<endl;
+                for (int i = 0; i < student_count; i++)
+                {
+                    cout<<"STUDENT "<<i+1<<":"<<endl;
+                    students[i]->displayStudentInfo();
+                    students[i]->computeGrade();
+                }
+            }
+            break;
+
+        case 4:
+            cout << "Exiting program." << endl;
+            for (int i = 0; i < student_count; i++)
+            {
+                delete students[i];
+            }
+            break;
+
+        default:
+            cout << "Invalid choice, please try again." << endl;
+            break;
+        }
     }
+    while (choice != 4);
 
-    return 0;
+    cout<<endl<<"24CE094"<<endl;
 }
