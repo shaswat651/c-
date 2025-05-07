@@ -1,111 +1,294 @@
-/* In a bid to design an efficient and user-friendly banking system, a structure was proposed that mirrors
-the real-world operations of various account types. The foundation of the system is a base class
-representing a generic bank account, encapsulating essential details such as account number and
-balance. Building on this foundation, two specialized account types were created: a savings account,
-which includes an interest rate as an additional feature, and a current account, which allows an
-overdraft limit to accommodate specific customer needs.
-To ensure proper initialization and cleanup of account objects, constructors and destructors were
-implemented. Essential banking operations such as deposits and withdrawals were made available for
-both account types, allowing users to perform and manage their transactions effectively. The system
-also accounted for the need to track and manage transaction history, enabling operations such as
-undoing the last transaction. This was achieved by simulating a mechanism to store a sequence of
-transactions for each account type, providing insight into different ways of managing and organizing
-data. */
-
-#include <iostream>
+#include<iostream>
+#include<fstream>
+#include<string>
 using namespace std;
 
-class BankAccount {
+class BankingAccount
+{
 protected:
-    int accountNumber;
-    float balance;
-    float lastTransaction;
-
+    int accno;
+    float accbal;
+    float prebal;
 public:
-    BankAccount(int accNo, float bal) {
-        accountNumber = accNo;
-        balance = bal;
-        lastTransaction = 0;
+    BankingAccount(int n, float b)
+    {
+        accno = n;
+        accbal = b;
     }
-
-    void deposit(float amount) {
-        balance += amount;
-        lastTransaction = amount;
-        cout << "Deposited: " << amount << endl;
-    }
-
-    virtual void withdraw(float amount) {
-        if (amount <= balance) {
-            balance -= amount;
-            lastTransaction = -amount;
-            cout << "Withdrawn: " << amount << endl;
-        } else {
-            cout << "Not enough balance!" << endl;
+    virtual void deposit(float amount, const string& transaction_file)
+    {
+        prebal = accbal;
+        accbal += amount;
+        ofstream file(transaction_file, ios::app);
+        if (file.is_open())
+        {
+            file << "Deposited: " << amount << " | Balance: " << accbal << endl;
+            file.close();
+        }
+        else
+        {
+            cout << "Error opening transaction file." << endl;
         }
     }
-
-    void undoLastTransaction() {
-        balance -= lastTransaction;
-        cout << "Undo Last Transaction: " << lastTransaction << endl;
-        lastTransaction = 0;
-    }
-
-    void showDetails() {
-        cout << "Account Number: " << accountNumber << ", Balance: " << balance << endl;
-    }
-};
-
-class SavingsAccount : public BankAccount {
-    float interestRate;
-public:
-    SavingsAccount(int accNo, float bal, float rate) : BankAccount(accNo, bal) {
-        interestRate = rate;
-    }
-
-    void showDetails() {
-        BankAccount::showDetails();
-        cout << "Interest Rate: " << interestRate << "%" << endl;
-    }
-};
-
-class CurrentAccount : public BankAccount {
-    float overdraftLimit;
-public:
-    CurrentAccount(int accNo, float bal, float limit) : BankAccount(accNo, bal) {
-        overdraftLimit = limit;
-    }
-
-    void withdraw(float amount) {
-        if (amount <= balance + overdraftLimit) {
-            balance -= amount;
-            lastTransaction = -amount;
-            cout << "Withdrawn: " << amount << endl;
-        } else {
-            cout << "Exceeds overdraft limit!" << endl;
+    virtual void withdraw(float amount, const string& transaction_file)
+    {
+        prebal = accbal;
+        if (accbal >= amount)
+        {
+            accbal -= amount;
+            ofstream file(transaction_file, ios::app);
+            if (file.is_open())
+            {
+                file << "Withdrawn: " << amount << " | Balance: " << accbal << endl;
+                file.close();
+            }
+            else
+            {
+                cout << "Error opening transaction file." << endl;
+            }
+        }
+        else
+        {
+            cout << "Insufficient funds." << endl;
         }
     }
-
-    void showDetails() {
-        BankAccount::showDetails();
-        cout << "Overdraft Limit: " << overdraftLimit << endl;
+    void undoLastTransaction(const string& transaction_file)
+    {
+        accbal = prebal;
+        ofstream file(transaction_file, ios::app);
+        if (file.is_open())
+        {
+            file << "Transaction undone | Balance: " << accbal << endl;
+            file.close();
+        }
+        else
+        {
+            cout << "Error opening transaction file." << endl;
+        }
     }
 };
 
-int main() {
-    SavingsAccount sAcc(101, 5000, 4.5);
-    cout << "\n--- Savings Account ---" << endl;
-    sAcc.showDetails();
-    sAcc.deposit(1000);
-    sAcc.withdraw(2000);
-    sAcc.undoLastTransaction();
-    sAcc.showDetails();
+class SavingAccount : public BankingAccount
+{
+    int interestrate;
+public:
+    SavingAccount(int num, float bal, int r) : BankingAccount(num, bal)
+    {
+        interestrate = r;
+    }
+    void applyinterest(const string& transaction_file)
+    {
+        float interest = (accbal * interestrate) / 100;
+        accbal += interest;
+        ofstream file(transaction_file, ios::app);
+        if (file.is_open())
+        {
+            file << "Applied interest: " << interest << " | Balance: " << accbal << endl;
+            file.close();
+        }
+        else
+        {
+            cout << "Error opening transaction file." << endl;
+        }
+    }
+};
 
-    CurrentAccount cAcc(202, 3000, 1000);
-    cout << "\n--- Current Account ---" << endl;
-    cAcc.showDetails();
-    cAcc.withdraw(3500);
-    cAcc.undoLastTransaction();
-    cAcc.showDetails();
+class currentaccount : public BankingAccount
+{
+    float limit;
+public:
+    currentaccount(int num, float bal, float lim) : BankingAccount(num, bal)
+    {
+        limit = lim;
+    }
+    void withdraw(float amount, const string& transaction_file) override
+    {
+        prebal = accbal;
+        if (accbal + limit >= amount)
+        {
+            accbal -= amount;
+            ofstream file(transaction_file, ios::app);
+            if (file.is_open())
+            {
+                file << "Withdrawn: " << amount << " | Balance: " << accbal << endl;
+                file.close();
+            }
+            else
+            {
+                cout << "Error opening transaction file." << endl;
+            }
+        }
+        else
+        {
+            cout << "Exceeds overdraft limit." << endl;
+        }
+    }
+};
 
-    return 0;
+void showTransactionHistory(const string& transaction_file)
+{
+    ifstream file(transaction_file);
+    string line;
+    if (file.is_open())
+    {
+        while (getline(file, line))
+        {
+            cout << line << endl;
+        }
+        file.close();
+    }
+    else
+    {
+        cout << "No transaction history available." << endl;
+    }
+}
+
+int main()
+{
+    int choice, acc_counter = 0;
+    int number, rate;
+    float balance, limit;
+    SavingAccount* s = nullptr;
+    currentaccount* c = nullptr;
+    string transaction_file;
+
+    cout<<"MENU-"<<endl;
+
+    cout << "1  Create saving account\n2  Create current account\n"
+         << "3  Deposit to saving account\n4  Withdraw from saving account\n"
+         << "5  Deposit to current account\n6  Withdraw from current account\n"
+         << "7  See transaction history\n8  Undo last transaction\n9  Exit";
+
+    do
+    {
+        cout << endl << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter account number for saving account: ";
+            cin >> number;
+            cout << "Enter initial balance for saving account: ";
+            cin >> balance;
+            cout << "Enter interest rate: ";
+            cin >> rate;
+            s = new SavingAccount(number, balance, rate);
+            transaction_file = "SavingAccount_" + to_string(number) + "_transactions.txt";
+            acc_counter++;
+            cout<<endl<<"YOUR SAVINGS ACCOUNT HAS BEEN CREATED!"<<endl;
+            break;
+
+        case 2:
+            cout << "Enter account number for current account: ";
+            cin >> number;
+            cout << "Enter initial balance for current account: ";
+            cin >> balance;
+            cout << "Enter overdraft limit: ";
+            cin >> limit;
+            c = new currentaccount(number, balance, limit);
+            transaction_file = "currentaccount_" + to_string(number) + "_transactions.txt";
+            acc_counter++;
+            cout<<endl<<"YOUR CURRENT ACCOUNT HAS BEEN CREATED!"<<endl;
+
+            break;
+
+        case 3:
+            if (s)
+            {
+                float deposit_amount;
+                cout << "Enter deposit amount: ";
+                cin >> deposit_amount;
+                s->deposit(deposit_amount, transaction_file);
+                cout<<endl<<"MONEY DEPOSITED TO SAVINGS ACCOUNT!"<<endl;
+
+            }
+            else
+            {
+                cout << "No saving account created." << endl;
+            }
+            break;
+
+        case 4:
+            if (s)
+            {
+                float withdraw_amount;
+                cout << "Enter withdraw amount: ";
+                cin >> withdraw_amount;
+                s->withdraw(withdraw_amount, transaction_file);
+                cout<<endl<<"MONEY WITHDRAWED FROM SAVINGS ACCOUNT!"<<endl;
+
+            }
+            else
+            {
+                cout << "No saving account created." << endl;
+            }
+            break;
+
+        case 5:
+            if (c)
+            {
+                float deposit_amount;
+                cout << "Enter deposit amount: ";
+                cin >> deposit_amount;
+                c->deposit(deposit_amount, transaction_file);
+                cout<<endl<<"MONEY DEPOSITED TO CURRENT ACCOUNT!"<<endl;
+
+            }
+            else
+            {
+                cout << "No current account created." << endl;
+            }
+            break;
+
+        case 6:
+            if (c)
+            {
+                float withdraw_amount;
+                cout << "Enter withdraw amount: ";
+                cin >> withdraw_amount;
+                c->withdraw(withdraw_amount, transaction_file);
+                cout<<endl<<"MONEY WITHDRAWED FROM CURRENT ACCOUNT!"<<endl;
+
+            }
+            else
+            {
+                cout << "No current account created." << endl;
+            }
+            break;
+
+        case 7:
+            showTransactionHistory(transaction_file);
+            break;
+
+        case 8:
+            if (s)
+            {
+                s->undoLastTransaction(transaction_file);
+            }
+            else if (c)
+            {
+                c->undoLastTransaction(transaction_file);
+            }
+            else
+            {
+                cout << "No account created." << endl;
+            }
+            break;
+
+        case 9:
+            cout << "Exiting system." << endl;
+            break;
+
+        default:
+            cout << "Invalid choice." << endl;
+            break;
+        }
+    }
+    while (choice != 9);
+
+    delete s;
+    delete c;
+
+    cout<<endl<<"24CE094"<<endl;
 }
