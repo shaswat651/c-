@@ -1,61 +1,92 @@
-/* In a growing city, a newly established bank sought to streamline its operations by implementing a
-digital system to manage customer accounts. The management envisioned a system where each
-account would store details about the account holder, their unique account number, and the current
-balance. To ensure flexibility and accuracy, they required functionalities for creating accounts with
-varying initial balances, depositing money, withdrawing funds (with checks for sufficient balance), and
-generating detailed account summaries.
-The bank's IT team faced the challenge of developing a robust solution. They began by sketching out
-the essential features of the system. The team highlighted that new accounts could be created in two
-ways: one with no initial balance, and another with specified account details and a starting amount.
-Additionally, they recognized the need for reliable mechanisms to handle deposits and withdrawals,
-ensuring proper validation to prevent overdrafts. Displaying account details in a clear format was also
-prioritized for customer communication.
-To ensure scalability, the team decided to simulate the system by creating multiple accounts using the
-proposed methods. They tested various scenarios, such as depositing and withdrawing different
-amounts, handling edge cases like insufficient funds, and verifying that the account summaries were
-accurate. This iterative approach helped them refine the system and ensure its readiness for
-deployment. */
-
 #include <iostream>
 using namespace std;
 
-class BankAccount {
-    int accNo;
+class Bankaccount {
     string name;
-    double balance;
+    int accno, balance;
 
 public:
-    
-    BankAccount(int a = 0, string n = "Shaswat", double b = 0.0)
-        : accNo(a), name(n), balance(b) {}
+    // Default constructor
+    Bankaccount() {
+        name = "n/a";
+        accno = 0;
+        balance = 0;
+    }
 
-    void deposit(double amount) {
+    // Parameterized constructor
+    Bankaccount(string n, int a, int b) {
+        name = n;
+        accno = a;
+        balance = b;
+    }
+
+    // Deposit function
+    void deposit(int amount) {
         balance += amount;
     }
 
-    void withdraw(double amount) {
-        if (amount <= balance)
+    // Withdraw function
+    void withdraw(int amount) {
+        if (balance >= amount) {
             balance -= amount;
-        else
-            cout << "Insufficient balance!\n";
+        } else {
+            cout << "ERROR: Insufficient Balance" << endl;
+        }
     }
 
-    void display() {
-        cout << "Account No: " << accNo << ", Name: " << name
-             << ", Balance: " << balance << endl;
+    // Display account details
+    void displaydetails() {
+        cout << "Name: " << name << endl;
+        cout << "Account Number: " << accno << endl;
+        cout << "Balance: " << balance << endl;
     }
 };
 
 int main() {
-    BankAccount a1, a2(101, "Shaswat", 1000), a3(102, "Prakruti", 500);
+    Bankaccount accounts[5];
 
-    a1.display();
-    a2.deposit(500);
-    a2.withdraw(300);
-    a2.display();
+    // Initializing accounts with correct order
+    accounts[0] = bankaccount("Alice", 101, 5000);
+    accounts[1] = bankaccount("Bob", 102, 3000);
+    accounts[2] = bankaccount("Charlie", 103, 7000);
+    accounts[3] = bankaccount("David", 104, 10000);
+    accounts[4] = bankaccount(); // Default constructor is automatically called
 
-    a3.withdraw(600); 
-    a3.display();
+    cout << "Bank Accounts Summary:" << endl;
+    for (int i = 0; i < 5; i++) {
+        accounts[i].displaydetails();
+        cout << "----------------------" << endl;
+    }
 
+    char choice;
+    do {
+        int index, operation;
+        cout << "Do you want to update any account? (y/n): ";
+        cin >> choice;
+        if (choice == 'y') {
+            cout << "Enter account index (1 to 5): ";
+            cin >> index;
+            if (index > 0 && index <= 5) {
+                cout << "Choose operation: 1. Deposit 2. Withdraw: ";
+                cin >> operation;
+                int amount;
+                cout << "Enter amount: ";
+                cin >> amount;
+                if (operation == 1) {
+                    accounts[index - 1].deposit(amount);
+                } else if (operation == 2) {
+                    accounts[index - 1].withdraw(amount);
+                } else {
+                    cout << "Invalid operation!" << endl;
+                }
+                cout << "Updated Account Details:" << endl;
+                accounts[index - 1].displaydetails();
+            } else {
+                cout << "Invalid account number!" << endl;
+            }
+        }
+    } while (choice == 'y');
+
+    cout<<endl<<"shaswat-24CE096";
     return 0;
 }
