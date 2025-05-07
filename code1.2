@@ -1,95 +1,94 @@
-/*A small retail store is facing challenges in managing its inventory effectively. The store sells a
-variety of products, each identified by a unique product ID, a name, the available quantity in
-stock, and the price per unit. To streamline their operations, the store needs a basic system to
-manage this inventory efficiently.
-The system must provide the ability to add new products to the inventory, ensuring that each
-product has its ID, name, quantity, and price properly recorded. Additionally, the system should     
-allow the store staff to update the quantity of any existing product, such as when new stock
-arrives or when items are sold.
-Another essential feature of the system is the calculation of the total value of all products in
-the inventory, which is determined by multiplying the quantity of each product by its price and
-summing these values for all products.*/
+#include <iostream>
+using namespace std;
 
+class Item
+{
+    int itemID;
+    string itemName;
+    int itemPrice;
+    int totalPrice;
+    int quantity;
 
-#include<iostream>
-#include<string>
-using namespace std;                                
-class product{
-private:
-int id;
-string name;
-int quantity;
-double prise;
-
-    public:
-        void add_product(){
-    cout<<"enter your id";
-    cin>>id;
-    cout<<"enter product name";
-    cin>>name;
-    cout<<"no of quantity";
-    cin>>quantity;
-    cout<<"enter product prise";
-    cin>>prise;
-        }
-        void update_product()
-        {
-  int q;
-  char choice;
-  double ID;
-  cout<<"enter the id in order to update you quantity";
-  cin>>ID;
-  if(id=ID){
-    cout<<"enter - in order to remove the quantity of the product";
-    cout<<"enter + in order to add the quantity of the product";
-    cout<<"enter your choise";
-    cin>>choice;
-
-    switch(choice){
-
-case'+':
+public:
+    void displayDetails()
     {
-        cout<<"enter the quantity";
-        cin>>q;
-        quantity= q+ quantity;
-        break;
-
+        cout << itemName << " " << itemPrice << " " << quantity << " " << totalPrice << endl;
     }
-case'-':
+
+    int findItem(int id)
     {
-        cout<<"enter your quantity";
-        cin>>q;
-        quantity=q-quantity;
-        break;
-    }
+        return (id == itemID);
     }
 
-  }
-  else{
-        cout<<"id is not found";
+    void increaseQuantity()
+    {
+        quantity++;
+        totalPrice = itemPrice * quantity;
+        cout << "Item ID " << itemID << " Found! Added to basket. New quantity: " << quantity << " Total price: " << totalPrice << endl;
+    }
 
-  }
-        }
-  void display_product()
-  {
-     int total_prise;
-     total_prise=prise*quantity;
-     cout<<"\n the ID:"<<id;
-     cout<<"\n product name"<<name;
-     cout<<"\n the quantity"<<quantity;
-     cout<<"\n the prise"<<prise;
-     cout<<"\n the total prise"<<total_prise;
+    void addItem(int id)
+    {
+        cout << "New item found!" << endl;
+        cout << "Enter item name: ";
+        cin >> itemName;
+        cout << "Enter item price: ";
+        cin >> itemPrice;
+        itemID = id;
+        quantity = 1;
+        totalPrice = itemPrice;
+    }
 
-
-  }
+    int getTotalPrice()
+    {
+        return totalPrice;
+    }
 };
+
 int main()
 {
-    product aa;
-    aa.add_product();
-     aa. display_product();
-    aa. update_product();
-       aa. display_product();
+    Item items[50];
+    int itemCount = 0, id, totalAmount = 0;
+    char choice;
 
-   return 0;
+start:
+    cout << "Enter item ID: ";
+    cin >> id;
+    bool found = false;
+
+    for (int i = 0; i < itemCount; i++)
+    {
+        if (items[i].findItem(id))
+        {
+            items[i].increaseQuantity();
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        items[itemCount].addItem(id);
+        itemCount++;
+    }
+
+    cout << "Do you want to add another item? (y/n): ";
+    cin >> choice;
+    if (choice == 'y')
+    {
+        goto start;
+    }
+    else
+    {
+
+        for (int i = 0; i < itemCount; i++)
+        {
+            totalAmount += items[i].getTotalPrice();
+        }
+
+        cout << endl << "Total Value Of All Products In The Inventory: " << totalAmount << endl;
+        cout << endl << "THANKYOU!";
+        cout << endl << "shaswat_24ce096";
+    }
+    return 0;
 }
