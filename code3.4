@@ -1,64 +1,62 @@
-/* A technology firm aimed to develop a flexible and reusable solution for managing collections of various
-data types, including integers, floating-point numbers, and characters. The system was intended to
-perform fundamental operations on these collections, such as finding the maximum value, reversing
-the collection, and displaying all elements. To achieve versatility and avoid redundancy in code, the
-solution was designed to use function templates, allowing the same logic to be applied seamlessly to
-different data types.
-The team recognized the importance of using dynamic arrays to store the collections, enabling
-efficient management of varying collection sizes. The design emphasized scalability and flexibility,
-ensuring that the system could handle different data types and their associated operations with
-minimal changes to the core logic.
-In practice, the system allowed for the creation of collections for various data types, such as integers,
-floating-point numbers, and characters. The operations on these collections included determining the
-maximum value, reversing the order of elements, and printing the collection contents. */
-
-#include <iostream>
+#include<iostream>
 using namespace std;
 
 template <typename T>
-T findMax(T* arr, int size) {
-    T maxVal = arr[0];
-    for (int i = 1; i < size; i++) if (arr[i] > maxVal) maxVal = arr[i];
-    return maxVal;
+T maxof3(T x, T y, T z)
+{
+    T max_num = x;
+    if (y > max_num) max_num = y;
+    if (z > max_num) max_num = z;
+    return max_num;
 }
 
 template <typename T>
-void reverseArray(T* arr, int size) {
-    for (int i = 0; i < size / 2; i++) swap(arr[i], arr[size - i - 1]);
+void reversing(T x, T y, T z)
+{
+    cout << z << " " << y << " " << x << endl;
 }
 
 template <typename T>
-void displayArray(T* arr, int size) {
-    for (int i = 0; i < size; i++) cout << arr[i] << " ";
-    cout << endl;
+void displaying_num(T x, T y, T z)
+{
+    cout << "First input: " << x << endl;
+    cout << "Second input: " << y << endl;
+    cout << "Third input: " << z << endl;
 }
 
-int main() {
-    
-    int size;
-    cout << "Enter size and elements for int array: ";
-    cin >> size;
-    int* intArr = new int[size];
-    for (int i = 0; i < size; i++) cin >> intArr[i];
-    displayArray(intArr, size);
-    cout << "Max: " << findMax(intArr, size) << ", Reversed: "; reverseArray(intArr, size); displayArray(intArr, size);
-    delete[] intArr;
+int main()
+{
+    int x, y, z;
+    float x1, y1, z1;
+    char x2, y2, z2;
 
-    cout << "\nEnter size and elements for float array: ";
-    cin >> size;
-    float* floatArr = new float[size];
-    for (int i = 0; i < size; i++) cin >> floatArr[i];
-    displayArray(floatArr, size);
-    cout << "Max: " << findMax(floatArr, size) << ", Reversed: "; reverseArray(floatArr, size); displayArray(floatArr, size);
-    delete[] floatArr;
+    cout << "Enter 3 Integer Digits: "<<endl;
+    cin >> x >> y >> z;
+    cout << "Enter 3 Float Values: "<<endl;
+    cin >> x1 >> y1 >> z1;
+    cout << "Enter 3 Characters: "<<endl;
+    cin >> x2 >> y2 >> z2;
 
-    cout << "\nEnter size and elements for char array: ";
-    cin >> size;
-    char* charArr = new char[size];
-    for (int i = 0; i < size; i++) cin >> charArr[i];
-    displayArray(charArr, size);
-    cout << "Max: " << findMax(charArr, size) << ", Reversed: "; reverseArray(charArr, size); displayArray(charArr, size);
-    delete[] charArr;
+    cout << "\nMaximum of all 3:\n";
+    cout << "INTEGERS: " << maxof3<int>(x, y, z) << endl;
+    cout << "FLOAT: " << maxof3<float>(x1, y1, z1) << endl;
+    cout << "CHARACTERS: " << maxof3<char>(x2, y2, z2) << endl;
 
-    return 0;
+    cout << "\nReversed Order:\n";
+    cout << "INTEGERS: ";
+    reversing<int>(x, y, z);
+    cout << "FLOAT: ";
+    reversing<float>(x1, y1, z1);
+    cout << "CHARACTERS: ";
+    reversing<char>(x2, y2, z2);
+
+    cout << "\nDisplayed Input Orders:\n";
+    cout << "INTEGERS:\n";
+    displaying_num<int>(x, y, z);
+    cout << "FLOAT:\n";
+    displaying_num<float>(x1, y1, z1);
+    cout << "CHARACTERS:\n";
+    displaying_num<char>(x2, y2, z2);
+
+    cout<<endl<<"shaswat";
 }
