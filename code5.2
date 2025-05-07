@@ -1,63 +1,80 @@
-/* A mathematical research group aimed to create a software model for handling and performing
-operations on complex numbers efficiently. To achieve this, they designed a Complex class that
-encapsulates the real and imaginary parts of a complex number. The class supports essential operator
-overloading to enhance usability, including the addition and subtraction of complex numbers and
-custom input and output functionality through the << and >> operators. These overloaded operators
-ensure seamless arithmetic and user interaction with the system.
-The task involves implementing this system and exploring its capabilities by performing various
-operations on complex numbers. Participants are expected to overload the specified operators and
-use them to add and subtract complex numbers, as well as to facilitate user-friendly input and output.
-Additionally, the solution encourages experimenting with managing collections of complex numbers
-to perform batch operations. */
-
-
 #include <iostream>
-
 using namespace std;
 
 class Complex {
 private:
-    double real, imag;
+    double real;
+    double imag;
 
 public:
-   
     Complex() : real(0), imag(0) {}
-
     Complex(double r, double i) : real(r), imag(i) {}
 
-    Complex operator+(const Complex& other) {
+    // Operator Overloading for +
+    Complex operator+(const Complex& other) const {
         return Complex(real + other.real, imag + other.imag);
     }
-    Complex operator-(const Complex& other) {
+
+    // Operator Overloading for -
+    Complex operator-(const Complex& other) const {
         return Complex(real - other.real, imag - other.imag);
     }
-    friend ostream& operator<<(ostream& os, const Complex& c) {
-        os << c.real << " + " << c.imag << "i";
-        return os;
-    }
-    friend istream& operator>>(istream& is, Complex& c) {
+
+    // Input operator >>
+    friend istream& operator>>(istream& in, Complex& c) {
         cout << "Enter real part: ";
-        is >> c.real;
+        in >> c.real;
         cout << "Enter imaginary part: ";
-        is >> c.imag;
-        return is;
+        in >> c.imag;
+        return in;
+    }
+
+    // Output operator <<
+    friend ostream& operator<<(ostream& out, const Complex& c) {
+        out << c.real;
+        if (c.imag >= 0)
+            out << " + " << c.imag << "i";
+        else
+            out << " - " << -c.imag << "i";
+        return out;
     }
 };
-void performOperations(Complex& c1, Complex& c2, Complex& c3) {
-    Complex result = c1 + c2;
-    cout << "Sum of first two complex numbers: " << result << endl;
-    result = result - c3;
-    cout << "After subtracting the third complex number: " << result << endl;
-}
-int main() {
-    Complex c1, c2, c3;
-    cout << "Enter complex number 1:" << endl;
-    cin >> c1; 
-    cout << "Enter complex number 2:" << endl;
-    cin >> c2; 
-    cout << "Enter complex number 3:" << endl;
-    cin >> c3; 
-    performOperations(c1, c2, c3);
-    return 0;
-}
 
+int main() {
+    const int MAX = 10;
+    Complex numbers[MAX];
+    int count;
+
+    cout << "How many complex numbers do you want to enter (max " << MAX << ")? ";
+    cin >> count;
+
+    if (count < 1 || count > MAX) {
+        cout << "Invalid number of inputs. Exiting.\n";
+        return 1;
+    }
+
+    for (int i = 0; i < count; ++i) {
+        cout << "\nComplex number " << (i + 1) << ":\n";
+        cin >> numbers[i];
+    }
+
+    cout << "\n--- Entered Complex Numbers ---\n";
+    for (int i = 0; i < count; ++i) {
+        cout << "Number " << (i + 1) << ": " << numbers[i] << endl;
+    }
+
+    // Batch operations
+    Complex sum, diff = numbers[0];
+    for (int i = 0; i < count; ++i) {
+        sum = sum + numbers[i];
+        if (i > 0) {
+            diff = diff - numbers[i];
+        }
+    }
+
+    cout << "\nSum of all complex numbers: " << sum << endl;
+    if (count > 1)
+        cout << "Difference (first - rest): " << diff << endl;
+
+    cout << endl << "24CE094" << endl;
+}
