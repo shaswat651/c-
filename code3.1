@@ -1,54 +1,84 @@
-/* A growing organization sought to enhance its payroll process to improve accuracy and efficiency in
-calculating employee salaries. The goal was to manage details such as the employee's name, basic
-salary, and bonus amount. While most employees would receive a default bonus, there was a need
-for flexibility to provide customized bonuses for exceptional performers or those in specialized roles.
-To ensure real-time computation of each employee's total salary, the system would dynamically
-calculate the total salary by adding the basic salary and the bonus. An inline function was chosen for
-this task, allowing the system to compute the total salary instantly during processing. The system was
-designed to initialize employee records using a constructor, where the bonus could either be set to a
-default value or adjusted according to specific employee criteria.
-As the organization expanded, managing employee records efficiently became a key consideration.
-The solution involved storing employee details dynamically, ensuring the system could handle a
-growing number of records while maintaining scalability and flexibility. Each employee record would
-include their personal details, basic salary, and bonus information, with the system displaying a
-breakdown of each employee’s details along with their total salary. */
-
-#include <iostream>
+#include<iostream>
 using namespace std;
-
-class Employee {
+class Employee
+{
     string name;
-    float basic, bonus;
+    int salary;
+    int bonus;
+    int totalsalary;
 
 public:
-    
-    Employee(string n, float b, float bon = 1000) {
-        name = n;
-        basic = b;
-        bonus = bon;
+    Employee()//default constructor
+    {
+        bonus=1500;//default bonus
+    }
+    Employee(string n,int s,int b)//parametarised constructor
+    {
+        name=n;
+        salary=s;
+        bonus=b;
+        totalsalary=caltotalsalary();
+    }
+    inline int caltotalsalary()//inline function
+    {
+        return totalsalary=salary+bonus;
+    }
+    void display()
+    {
+        cout<<"Name of Employee: "<<name<<endl;
+        cout<<"Salary of Employee: "<<salary<<endl;
+        cout<<"Bonus of Employee: "<<bonus<<endl;
+        cout<<"Total Salary of Employee: "<<totalsalary<<endl<<endl;
     }
 
-   
-    inline float totalSalary() {
-        return basic + bonus;
-    }
-
-    void display() {
-        cout << "Name: " << name
-             << ", Basic: " << basic
-             << ", Bonus: " << bonus
-             << ", Total Salary: " << totalSalary() << endl;
-    }
 };
 
-int main() {
-    Employee e1("Alice", 30000);                 
-    Employee e2("Bob", 40000, 3000);             
-    Employee e3("Charlie", 35000, 2000);        
+int main()
+{
+    int n;
+    cout<<"Enter the Number of Employee you want to Add the Datas For:";
+    cin>>n;
+    Employee** e = new Employee*[n];
 
-    e1.display();
-    e2.display();
-    e3.display();
+    for(int i=0;i<n;i++)
+    {
+        string name;
+        int bonus,salary;
+        string x;
+        cout<<"Enter the Name of the Emplyoee "<< i+1 << ":";
+        cin>>name;
+        cout<<"Enter the Salary of Employee " <<i+1<<":";
+        cin>>salary;
+        cout<<"Do you wnat to enter extra bonus for this Employee? (y/n)";
+        cin>>x;
+        if(x=="y" || x=="Y")
+        {
+            cout<<"Enter the bonus ammount you want to add for Employee " <<i+1<<":";
+            cin>>bonus;
+            e[i]= new Employee(name,salary,bonus);
 
-    return 0;
+
+        }
+        else if (x=="n" || x=="N")
+        {
+            cout<<"Applying Default Bonus for this Employee"<<endl;
+            e[i]=new Employee(name,salary,1500);
+        }
+        else
+        {
+            cout<<"Please Enter a Valid Choice"<<endl;
+        }
+       cout<<endl;
+
+    }
+    for (int i=0;i<n;i++)
+    {
+        cout<<"Details Of the Employee "<<i+1<<":"<<endl;
+        e[i]->display();
+    }
+    for (int i = 0; i < n; i++)
+    {
+        delete e[i];
+    }
+    cout<<"shaswat";
 }
