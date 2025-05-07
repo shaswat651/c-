@@ -1,78 +1,92 @@
-/* A bank wants to create a simple system to manage customer bank accounts. The system should
-allow customers to perform basic banking operations such as depositing money, withdrawing
-money, and checking their account balance.
-Each bank account will need to have an account holder's name, a unique account number, and
-a balance. Deposits should increase the account balance, while withdrawals should only be
-allowed if there are sufficient funds in the account. If an attempt is made to withdraw more
-money than is available, an error message should be displayed. Customers should also have the
-ability to view their account balance whenever required.
-The system must be designed using Object-Oriented Programming principles, focusing on
-creating a simple and efficient solution to manage the accounts effectively. The system should
-ensure that all account details are secure and accessible only through authorized methods. */
-
-
 #include <iostream>
-#include <string>
-
-
 using namespace std;
 
-class bankaccount{
-    string account_name;
-    string account_number;
-    double account_balance;
-
-    public:
-    
-    bankaccount(string name,string number,double balance){
-        account_name=name;
-        account_number=number;
-        account_balance=balance;
-
-    }
-
-    void deposite(double ammount)
+class Bankaccount
+{
+    string name;
+    int accno;
+    float balance;
+public:
+    void oppenacc()
     {
-       if(ammount>0){
-        account_balance+=ammount;
-        cout<<"Deposite is succesfully Done";
-        cout<<"Your Current Balance is : "<<account_balance;
-       } 
-       else
-       {
-        cout<<"Deposite is Fail ";
-       }
+        cout<<"Enter Account Holder's Name: ";
+        cin>>name;
+        cout<<"Enter Account Number: ";
+        cin>>accno;
+        cout<<"Enter Balance: ";
+        cin>>balance;
     }
-
-    void withdraw(double ammount)
+    void displaydetails()
     {
-       if(ammount>0&&ammount<=account_balance)
-       {
-        account_balance-=ammount;
-        cout<<"withdraw is succesfully Done";
-        cout<<"Your Current Balance is : "<<account_balance;
-       } 
-       else
-       {
-        cout<<"withdraw is Fail ";
-       }
+        cout<<"The Account Details Are as Follows:"<<endl;
+        cout<<"NAME:"<<name<<endl;
+        cout<<"ACCOUNT NUMBER:"<<accno<<endl;
+        cout<<"BALANCE:"<<balance<<endl;
     }
-    void display()
+    int deposit()
     {
-        cout<<"NAME : "<<account_name<<endl;
-        cout<<"NUMBER : "<<account_number<<endl;
-        cout<<"BALANCE : "<<account_balance<<endl;
+        int s;
+        cout<<"Enter the Amount you want to Deposit: ";
+        cin>>s;
+        balance=balance+s;
+        return balance;
     }
-
+    int withdraw()
+    {
+        int a;
+        cout<<"Enter the Amount you want to Withdraw: ";
+        cin>>a;
+        if (balance>=a)
+        {
+            balance=balance-a;
+            return balance;
+        }
+        else
+        {
+            cout<<"ERROR:Insufficient Balance"<<endl;
+        }
+    }
+    int displaybalance()
+    {
+        cout<<"The Updated Balance Is:"<<balance;
+    }
 };
 
 int main()
 {
-    bankaccount s1("shaswat","12345342",5000);
+    Bankaccount x;
+    int y;
 
-    s1.deposite(100);
-    s1.withdraw(50);
-    s1.display();
+    x.oppenacc();
+    x.displaydetails();
 
-    return 0;
+     cout<<endl<<"TO DEPOSIT enter 1"<<endl<<"TO WITHDRAW enter 2"<<endl<<"TO CHECK CURRENT BALANCE enter 3"<<endl<<"TO EXIT enter 4"<<endl;
+
+
+    do{
+        cout<<"Enter Your Choice:";
+        cin>>y;
+
+        switch(y)
+        {
+        case 1:
+            x.deposit();
+            break;
+        case 2:
+            x.withdraw();
+            break;
+        case 3:
+            x.displaybalance();
+            break;
+        case 4:
+            cout<<"Thank you!"<<endl;
+            break;
+        default:
+            cout<<"Please Enter Valid Choice!"<<endl;
+        }
+    }
+    while(y!=4);
+    cout<<endl<<"shaswat_24ce096";
+
 }
+
