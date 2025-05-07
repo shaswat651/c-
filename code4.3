@@ -1,66 +1,84 @@
-/* A vehicle manufacturing company sought to create a robust system to organize and manage the
-details of various cars produced under its brand. To accomplish this, a hierarchical structure was
-conceptualized, reflecting the essential components of a vehicle. At the foundation, a class was
-designed to represent the type of fuel a vehicle uses. Another class was created to capture the brand
-name of the vehicle. These two foundational elements were then combined into a derived class
-specifically representing cars, integrating both fuel type and brand information.
-Constructors were used at each level to ensure proper initialization of attributes, allowing seamless
-integration of all details. Additionally, the ability to display complete information about a car, including
-its fuel type and brand, was incorporated into the system. To simulate a real-world scenario such as a
-service queue, multiple cars were organized and processed sequentially using a structured approach.
-This not only streamlined the handling of cars but also provided an opportunity to compare different
-methods of managing the collection and processing of vehicle data. */
-
 #include <iostream>
 using namespace std;
 
-class Fuel {
+class FuelType
+{
 protected:
-    string fuelType;
+    string fuel;
+
 public:
-    Fuel(string fuel = "") {
-        fuelType = fuel;
+    FuelType(string f)
+    {
+        fuel = f;
     }
-    void showFuel() {
-        cout << "Fuel Type: " << fuelType << endl;
+
+    void displayFuel()
+    {
+        cout << "Fuel Type: " << fuel << endl;
     }
 };
 
-class Brand {
+class Brand
+{
 protected:
-    string brandName;
+    string brand;
+
 public:
-    Brand(string brand = "") {
-        brandName = brand;
+    Brand(string b)
+    {
+        brand = b;
     }
-    void showBrand() {
-        cout << "Brand Name: " << brandName << endl;
+
+    void displayBrand()
+    {
+        cout << "Brand: " << brand << endl;
     }
 };
 
-class Car : public Fuel, public Brand {
-public:
-    Car(string fuel, string brand) : Fuel(fuel), Brand(brand) {}
 
-    void showCar() {
-        showFuel();
-        showBrand();
+class Car : public FuelType, public Brand
+{
+public:
+    Car(string f, string b) : FuelType(f), Brand(b) {}
+
+    void displayCarDetails()
+    {
+        displayBrand();
+        displayFuel();
     }
 };
 
-int main() {
-    const int SIZE = 3;
-    Car serviceQueue[SIZE] = {
-        Car("Petrol", "Toyota"),
-        Car("Diesel", "Ford"),
-        Car("Electric", "Tesla")
-    };
+int main()
+{
+    int numCars;
 
-    cout << "Service Queue:\n";
-    for (int i = 0; i < SIZE; i++) {
+    cout << "Enter number of cars in service queue: ";
+    cin >> numCars;
+
+    Car* serviceQueue[100];
+
+    for (int i = 0; i < numCars; i++)
+    {
+        string brand, fuel;
+        cout << "\nEnter details for Car " << i + 1 << ":\n";
+        cout << "Enter brand: ";
+        cin >> ws;
+        getline(cin, brand);
+
+        cout << "Enter fuel type (e.g., Petrol, Diesel, Electric): ";
+        cin >> ws;
+        getline(cin, fuel);
+
+        serviceQueue[i] = new Car(fuel, brand);
+    }
+
+    cout << "\nCAR DETAILS:";
+    for (int i = 0; i < numCars; i++)
+    {
         cout << "\nCar " << i + 1 << ":\n";
-        serviceQueue[i].showCar();
+        serviceQueue[i]->displayCarDetails();
+        delete serviceQueue[i];
     }
 
-    return 0;
+    cout<<endl<<" 24CE094";
 }
