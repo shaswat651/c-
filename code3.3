@@ -1,65 +1,238 @@
-/* A community bank sought to enhance its account management system with a digital solution to
-improve efficiency and provide better customer service. The system was required to manage the
-essential details of each account, including the account number, account holder’s name, and balance.
-Additionally, the bank wanted to provide a secure mechanism for transferring money between
-accounts, allowing customers to easily manage their funds.
-The bank also needed a way to track the total number of accounts created, which would be important
-for generating reports and understanding the growth of their customer base. This feature was aimed
-at helping the bank maintain an overview of their account portfolio and analyze trends over time.
-To ensure smooth and reliable operations, the system was designed to store account information in a
-way that would allow easy access and updates. When new accounts were created, they would be
-added to the system dynamically. The management team planned for future scalability and
-performance improvements by considering more efficient storage and retrieval methods after the
-initial system was built, ensuring that the bank could easily accommodate more accounts and
-transactions as the customer base grew. */
 
-#include <iostream> 
+#include <iostream>
 using namespace std;
 
-class Account {
-public:
-    int accNo;
+class Accounts
+{
+    int accno;
     string name;
-    float balance;
-    static int count;
+    int balance;
 
-    Account(int a, string n, float b) {
-        accNo = a;
+public:
+    Accounts(int a, string n, int b)
+    {
+        accno = a;
         name = n;
         balance = b;
-        count++;
     }
 
-    void show() {
-        cout << accNo << " | " << name << " | Balance: " << balance << endl;
-    }
-
-    void transfer(Account &other, float amount) {
-        if (balance >= amount) {
-            balance -= amount;
-            other.balance += amount;
-        } else {
-            cout << "Not enough balance to transfer!\n";
+    void deposit(int amount)
+    {
+        if (amount > 0)
+        {
+            balance += amount;
+            cout << "Deposited " << amount << " to account " << accno
+                 << ". New balance: " << balance << "\n";
         }
+        else
+        {
+            cout << "Invalid deposit amount.\n";
+        }
+    }
+
+    void withdraw(int amount)
+    {
+        if (amount <= balance)
+        {
+            balance -= amount;
+            cout << "Withdrew " << amount << " from account " << accno
+                 << ". New balance: " << balance << "\n";
+        }
+        else
+        {
+            cout << "Insufficient funds.\n";
+        }
+    }
+
+    void transfer(Accounts* target, int amount)
+    {
+        if (!target)
+        {
+            cout << "Target account does not exist.\n";
+            return;
+        }
+
+        if (amount <= 0)
+        {
+            cout << "Invalid transfer amount.\n";
+            return;
+        }
+
+        if (amount > balance)
+        {
+            cout << "Transfer failed: Insufficient funds.\n";
+            return;
+        }
+
+        withdraw(amount);
+        target->deposit(amount);
+        cout << "Transferred " << amount << " from account " << accno
+             << " to account " << target->accno << "\n";
+    }
+
+    void display() const
+    {
+        cout << "ACCOUNT NUMBER: " << accno << endl << "NAME: " << name
+             <<endl<< "BALANCE: " << balance << "\n";
+    }
+
+    int getAccountNumber() const
+    {
+        return accno;
     }
 };
 
-int Account::count = 0;
 
-int main() {
-    Account a1(1, "Shaswat", 5000);
-    Account a2(2, "Prakruti", 3000);
+Accounts* findaccount(Accounts** a, int totalAccounts, int accno)
+{
+    for (int i = 0; i < totalAccounts; ++i)
+    {
+        if (a[i]->getAccountNumber() == accno)
+        {
+            return a[i];
+        }
+    }
+    return nullptr;
+}
 
-    a1.show();
-    a2.show();
+int main()
+{
+    Accounts* a[100];
+    int totalAccounts = 0;
+    int choice;
 
-    a1.transfer(a2, 1000);
+    // Menu-driven system to input Accounts and operations
+    do
+    {
+        cout << "\n----- MENU -----\n";
+        cout << "1. Create Account\n";
+        cout << "2. Deposit\n";
+        cout << "3. Withdraw\n";
+        cout << "4. Transfer\n";
+        cout << "5. Display Account Info\n";
+        cout << "6. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
 
-    cout << "\nAfter Transfer:\n";
-    a1.show();
-    a2.show();
+        switch (choice)
+        {
+        case 1:
+        {
+            // Create new account
+            int accno;
+            string name;
+            int balance;
+            cout << "Enter Account Number: ";
+            cin >> accno;
+            cin.ignore(); // To clear the newline character
+            cout << "Enter Account Holder's Name: ";
+            getline(cin, name);
+            cout << "Enter Initial Balance: ";
+            cin >> balance;
 
-    cout << "\nTotal Accounts: " << Account::count << endl;
+            a[totalAccounts++] = new Accounts(accno, name, balance);
+            cout << "Account created successfully!\n";
+            break;
+        }
+        case 2:
+        {
+            // Deposit
+            int accno, amount;
+            cout << "Enter Account Number to Deposit: ";
+            cin >> accno;
+            cout << "Enter Amount to Deposit: ";
+            cin >> amount;
 
-    return 0;
+            Accounts* acc = findaccount(a, totalAccounts, accno);
+            if (acc)
+            {
+                acc->deposit(amount);
+            }
+            else
+            {
+                cout << "Account not found!\n";
+            }
+            break;
+        }
+        case 3:
+        {
+            // Withdraw
+            int accno, amount;
+            cout << "Enter Account Number to Withdraw from: ";
+            cin >> accno;
+            cout << "Enter Amount to Withdraw: ";
+            cin >> amount;
+
+            Accounts* acc = findaccount(a, totalAccounts, accno);
+            if (acc)
+            {
+                acc->withdraw(amount);
+            }
+            else
+            {
+                cout << "Account not found!\n";
+            }
+            break;
+        }
+        case 4:
+        {
+            // Transfer
+            int sourceAccno, targetAccno, amount;
+            cout << "Enter Source Account Number: ";
+            cin >> sourceAccno;
+            cout << "Enter Target Account Number: ";
+            cin >> targetAccno;
+            cout << "Enter Amount to Transfer: ";
+            cin >> amount;
+
+            Accounts* sourceAcc = findaccount(a, totalAccounts, sourceAccno);
+            Accounts* targetAcc = findaccount(a, totalAccounts, targetAccno);
+
+            if (sourceAcc && targetAcc)
+            {
+                sourceAcc->transfer(targetAcc, amount);
+            }
+            else
+            {
+                cout << "One or both Accounts not found!\n";
+            }
+            break;
+        }
+        case 5:
+        {
+            // Display Account Info
+            int x;
+            cout << "Enter Account Number to Display Info: ";
+            cin >> x;
+
+            Accounts* acc = findaccount(a, totalAccounts, x);
+            if (acc)
+            {
+                cout<<"DISPLAYING DETAILS FOR ACCOUNT NUMBER "<< x <<":"<<endl;
+                acc->display();
+            }
+            else
+            {
+                cout << "Account not found!\n";
+            }
+            break;
+        }
+        case 6:
+            // Exit
+            cout << "Exiting...THANKYOU\n";
+            break;
+        default:
+            cout << "Invalid choice! Please try again.\n";
+        }
+
+    }
+    while (choice != 6);
+
+
+    for (int i = 0; i < totalAccounts; ++i)
+    {
+        delete a[i];
+    }
+
+    cout<<endl<<"shaswat";
 }
