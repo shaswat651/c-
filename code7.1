@@ -1,75 +1,111 @@
-/* A media research team is developing a tool to analyze word frequency in large textual datasets, such
-as news articles and research papers. The goal is to process a given paragraph, identify individual
-words, and count their occurrences while ensuring case-insensitive matching. Since the tool is
-intended for both constrained environments and high-performance systems, two different
-approaches are considered—one utilizing dynamic memory management and another relying on
-manually structured arrays.
-The first challenge is reading an entire paragraph from the console as a single unformatted string.
-Once acquired, the text must be split into individual words, ensuring that uppercase and lowercase
-variations are treated as the same. To store and process words dynamically, the team designs a
-
-mechanism using raw pointers and dynamic memory allocation, allowing the program to handle
-variable input sizes effectively.
-In one approach, a dynamically allocated array is used to store words, with additional logic to count
-occurrences efficiently. The array expands as needed, ensuring that new words can be
-accommodated. The frequency counting is implemented manually by searching for existing words in
-the array and updating counts accordingly. */
-
-
 #include <iostream>
-#include <sstream>
-#include <string>
-
+#include <cctype>
+#include <cstring>
 using namespace std;
 
-void toLowerCase(string &word) {
-    for (int i = 0; i < word.length(); ++i) {
-        if (word[i] >= 'A' && word[i] <= 'Z') {
-            word[i] = word[i] + 32;
-        }
-    }
+const int INITIAL_CAPACITY = 10;
+const int WORD_MAX_LENGTH = 100;
+
+// Convert a string to lowercase
+void toLowercase(char* str) {
+    for (int i = 0; str[i]; ++i)
+        str[i] = tolower(str[i]);
 }
 
-int main() {
-    string s; 
-    cout << "Enter a paragraph: ";
-    getline(cin, s);
+// Check if a character is a delimiter
+bool isDelimiter(char ch) {
+    return !isalpha(ch);  // Consider only alphabetic characters as part of words
+}
 
- 
-    string u[50]; 
-    int c[50] = {0};
-    string* k = u; 
-    int totalWords = 0; 
-    stringstream ss(s);
-    string word;
+// Function to tokenize and count word frequencies
+void analyzeText(const char* paragraph) {
+    // Dynamic arrays for storing words and their frequencies
+    char** words = new char*[INITIAL_CAPACITY];
+    int* freq = new int[INITIAL_CAPACITY];
+    int capacity = INITIAL_CAPACITY;
+    int count = 0;
 
-    while (ss >> word) {
-        toLowerCase(word); 
+    char word[WORD_MAX_LENGTH];
+    int idx = 0;
 
-        bool found = false;
+    for (int i = 0; ; ++i) {
+        char ch = paragraph[i];
 
-        // Check if the word already exists in the array `u`
-        for (int i = 0; i < totalWords; ++i) {
-            if (u[i] == word) {
-                c[i]++;  // If the word is found, increment its count
-                found = true;
-                break;
+        if (ch == '\0' || isDelimiter(ch)) {
+            if (idx > 0) {
+                word[idx] = '\0';
+                toLowercase(word);
+
+                // Search for the word in the existing array
+                bool found = false;
+                for (int j = 0; j < count; ++j) {
+                    if (strcmp(words[j], word) == 0) {
+                        freq[j]++;
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If not found, add new word
+                if (!found) {
+                    if (count == capacity) {
+                        // Expand capacity
+                        int newCapacity = capacity * 2;
+                        char** newWords = new char*[newCapacity];
+                        int* newFreq = new int[newCapacity];
+
+                        for (int k = 0; k < count; ++k) {
+                            newWords[k] = words[k];
+                            newFreq[k] = freq[k];
+                        }
+
+                        delete[] words;
+                        delete[] freq;
+
+                        words = newWords;
+                        freq = newFreq;
+                        capacity = newCapacity;
+                    }
+
+                    words[count] = new char[strlen(word) + 1];
+                    strcpy(words[count], word);
+                    freq[count] = 1;
+                    count++;
+                }
+
+                idx = 0; // Reset for next word
+            }
+        } else {
+            if (idx < WORD_MAX_LENGTH - 1) {
+                word[idx++] = ch;
             }
         }
 
-        // If the word is not found, add it to the array `u` and set its count to 1
-        if (!found) {
-            u[totalWords] = word;
-            c[totalWords] = 1;
-            totalWords++;  // Increase the count of unique words
-        }
+        if (ch == '\0') break;
     }
 
-    // Output the frequency of each word
-    cout << "\nWord Frequency:\n";
-    for (int i = 0; i < totalWords; ++i) {
-        cout << u[i] << ": " << c[i] << endl;
+    // Display word frequencies
+    cout << "\nWord Frequencies:\n";
+    for (int i = 0; i < count; ++i) {
+        cout << words[i] << ": " << freq[i] << endl;
     }
 
-    return 0;
+    // Free memory
+    for (int i = 0; i < count; ++i) {
+        delete[] words[i];
+    }
+    delete[] words;
+    delete[] freq;
+}
+
+int main() {
+    const int MAX_PARAGRAPH_LENGTH = 1000;
+    char paragraph[MAX_PARAGRAPH_LENGTH];
+
+    cout << "Enter a paragraph:\n";
+    cin.getline(paragraph, MAX_PARAGRAPH_LENGTH);
+
+    analyzeText(paragraph);
+
+    cout << endl << " 24CE094" << endl;
 }
